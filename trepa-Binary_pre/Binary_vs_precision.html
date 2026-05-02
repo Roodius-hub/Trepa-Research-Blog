@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary vs Precision Payouts - Comparison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: #000000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        .bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 159, 0.02) 2px, rgba(0, 255, 159, 0.02) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(138, 180, 248, 0.02) 2px, rgba(138, 180, 248, 0.02) 4px);
+            animation: patternMove 30s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 56px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            text-shadow: 0 0 20px rgba(138, 180, 248, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8ab4f8;
+            font-size: 14px;
+            margin-bottom: 60px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .column {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid;
+            border-radius: 16px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .column::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .column-binary {
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .column-binary::before {
+            background: linear-gradient(90deg, #ff6b6b, #ee5a6f);
+        }
+
+        .column-precision {
+            border-color: rgba(0, 255, 159, 0.3);
+        }
+
+        .column-precision::before {
+            background: linear-gradient(90deg, #00ff9f, #00e5ff);
+        }
+
+        .column:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .column-binary:hover {
+            border-color: rgba(255, 107, 107, 0.6);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.2);
+        }
+
+        .column-precision:hover {
+            border-color: rgba(0, 255, 159, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 255, 159, 0.2);
+        }
+
+        .column-title {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .column-binary .column-title {
+            color: #ff6b6b;
+        }
+
+        .column-precision .column-title {
+            color: #00ff9f;
+        }
+
+        .section {
+            margin-bottom: 35px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8ab4f8;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .section-content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #ffffff;
+        }
+
+        .highlight {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .column-binary .highlight {
+            background: rgba(255, 107, 107, 0.15);
+            color: #ff9f9f;
+        }
+
+        .column-precision .highlight {
+            background: rgba(0, 255, 159, 0.15);
+            color: #00ff9f;
+        }
+
+        .example-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid;
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .column-binary .example-box {
+            border-color: #ff6b6b;
+        }
+
+        .column-precision .example-box {
+            border-color: #00ff9f;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #8ab4f8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .column-binary .metric-value {
+            color: #ff6b6b;
+        }
+
+        .column-precision .metric-value {
+            color: #00ff9f;
+        }
+
+        .pros-cons {
+            margin-top: 30px;
+        }
+
+        .pros-cons-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .pros-title {
+            color: #00ff9f;
+        }
+
+        .cons-title {
+            color: #ff6b6b;
+        }
+
+        .list-item {
+            padding: 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .list-item::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #8ab4f8;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: rgba(138, 180, 248, 0.6);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <div class="container">
+        <h1>Binary vs Precision</h1>
+        <p class="subtitle">Two fundamentally different payout models</p>
+        
+        <div class="comparison-grid">
+            <!-- Binary Column -->
+            <div class="column column-binary">
+                <h2 class="column-title">Binary Markets</h2>
+                
+                <div class="section">
+                    <div class="section-label">Question Format</div>
+                    <div class="section-content">
+                        "Will BTC be <span class="highlight">above $100K</span> on Dec 31?"<br>
+                        YES or NO
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-label">Payout Structure</div>
+                    <div class="section-content">
+                        All or nothing. Right side = 100% payout.<br>
+                        Wrong side = <span class="highlight">0% payout</span>.
+                    </div>
+                    <div class="example-box">
+                        You buy YES at $0.60. If BTC hits $100,001, you win $1.00 per share (+67% return). If it hits $99,999, you lose everything.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-label">Key Metrics</div>
+                    <div class="metric">
+                        <span class="metric-label">Win Condition</span>
+                        <span class="metric-value">Directional</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Skill Measured</span>
+                        <span class="metric-value">Conviction</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Variance</span>
+                        <span class="metric-value">High</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Liquidity Model</span>
+                        <span class="metric-value">Orderbook/AMM</span>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title pros-title">Strengths</div>
+                    <div class="list-item">Simple to understand (yes/no)</div>
+                    <div class="list-item">Lock in your odds before resolution</div>
+                    <div class="list-item">Deep liquidity on popular events</div>
+                    <div class="list-item">Decades of research backing the model</div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title cons-title">Weaknesses</div>
+                    <div class="list-item">High variance (win big or lose all)</div>
+                    <div class="list-item">Only captures threshold crossing</div>
+                    <div class="list-item">No partial credit for near-misses</div>
+                    <div class="list-item">51% confidence = 99% confidence in payout</div>
+                </div>
+            </div>
+
+            <!-- Precision Column -->
+            <div class="column column-precision">
+                <h2 class="column-title">Precision Markets</h2>
+                
+                <div class="section">
+                    <div class="section-label">Question Format</div>
+                    <div class="section-content">
+                        "What will BTC price be <span class="highlight">at exactly 3:00 PM</span>?"<br>
+                        Numerical estimate
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-label">Payout Structure</div>
+                    <div class="section-content">
+                        Proportional to accuracy. Closer = bigger share.<br>
+                        Win if <span class="highlight">below median error</span>.
+                    </div>
+                    <div class="example-box">
+                        You predict $97,234. Actual: $97,180. Your error: $54. If median error is $120, you win and get paid proportionally to how much closer you were vs others.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-label">Key Metrics</div>
+                    <div class="metric">
+                        <span class="metric-label">Win Condition</span>
+                        <span class="metric-value">Accuracy</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Skill Measured</span>
+                        <span class="metric-value">Calibration</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Variance</span>
+                        <span class="metric-value">Lower</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Liquidity Model</span>
+                        <span class="metric-value">Parimutuel Pool</span>
+                    </div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title pros-title">Strengths</div>
+                    <div class="list-item">Partial credit for near-misses</div>
+                    <div class="list-item">Captures full distribution, not just probability</div>
+                    <div class="list-item">Lower variance for skilled forecasters</div>
+                    <div class="list-item">No liquidity fragmentation across strikes</div>
+                    <div class="list-item">Enables micro-interval resolution (60s)</div>
+                </div>
+
+                <div class="pros-cons">
+                    <div class="pros-cons-title cons-title">Weaknesses</div>
+                    <div class="list-item">Higher cognitive load (need actual numbers)</div>
+                    <div class="list-item">Can't lock in odds (parimutuel opacity)</div>
+                    <div class="list-item">Limited to continuous outcome events</div>
+                    <div class="list-item">Less validation at ultra-fast intervals</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            DIFFERENT QUESTIONS • DIFFERENT INCENTIVES • COMPLEMENTARY INFORMATION LAYERS
+        </div>
+    </div>
+</body>
+</html>
